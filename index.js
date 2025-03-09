@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const { initializeApp } = require('firebase/app');
+const { getFirestore, collection, addDoc, getDocs } = require('@firebase/firestore');
 const axios = require('axios');
 const cors = require('cors');
 
@@ -16,7 +17,8 @@ const firebaseConfig = {
   messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
   appId: process.env.FIREBASE_APP_ID
 };
-initializeApp(firebaseConfig);
+const firebaseApp = initializeApp(firebaseConfig);
+const db = getFirestore(firebaseApp);
 
 app.get('/health', (req, res) => res.send('Firebase ready'));
 
@@ -43,9 +45,29 @@ app.post('/xai', async (req, res) => {
         }
       }
     );
-    res.send({ message: response.data.choices[0].message.content });
+    const message = response.data.choices[0].message.content;
+
+    // Save to Firestore
+    await addDoc(collection(db, 'chatHistory'), {
+      prompt,
+      response: message,
+      timestamp: new Date().toISOString()
+    });
+
+    res.send({ message });
   } catch (error) {
     res.status(500).send({ error: 'xAI error', details: error.response?.data || error.message });
+  }
+});
+
+// New endpoint for history
+app.get('/history', async (req, res) => {
+  try {
+    const snapshot = await getDocs(collection(db, 'chatHistory'));
+    const history = snapshot.docs.map(doc => doc.data());
+    res.send(history);
+  } catch (error) {
+    res.status(500).send({ error: 'Firestore error', details: error.message });
   }
 });
 
