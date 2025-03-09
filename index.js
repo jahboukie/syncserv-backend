@@ -72,3 +72,6 @@ app.get('/history', async (req, res) => {
 });
 
 app.listen(3001, () => console.log('Server running on 3001'));
+app.get('/xai', (req, res) => {
+  res.send('This endpoint requires a POST request with a JSON body. Use curl or a form to test.');
+});
