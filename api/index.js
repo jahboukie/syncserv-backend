@@ -2,7 +2,9 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 
-app.use(cors({ origin: 'http://localhost:5175' }));
+app.use(cors({
+  origin: ['http://localhost:5175', 'https://syncserv-widget.vercel.app']
+}));
 app.use(express.json());
 
 app.get('/xai', (req, res) => {
@@ -11,13 +13,12 @@ app.get('/xai', (req, res) => {
 
 app.post('/xai', async (req, res) => {
   const { prompt } = req.body;
-  // Your xAI logic here
   res.json({ message: `Hello there! I'm Grok...` });
 });
 
 app.get('/history', (req, res) => {
-  // Your history logic here
   res.json([]); // Placeholder
 });
 
-module.exports = app;
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
