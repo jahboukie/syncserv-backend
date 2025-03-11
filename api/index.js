@@ -3,7 +3,9 @@ const cors = require('cors');
 const app = express();
 
 app.use(cors({
-  origin: ['http://localhost:5175', 'https://syncserv-widget.vercel.app']
+  origin: ['http://localhost:5175', 'https://syncserv-widget.vercel.app'],
+  methods: ['GET', 'POST', 'OPTIONS'], // Explicitly allow OPTIONS
+  allowedHeaders: ['Content-Type'], // Allow necessary headers
 }));
 app.use(express.json());
 
@@ -20,8 +22,9 @@ app.get('/history', (req, res) => {
   res.json([]); // Placeholder
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 app.get('/', (req, res) => {
   res.send('Welcome to SyncServ.ai Backend! Use /xai for the API.');
 });
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
